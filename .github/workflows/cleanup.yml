@@ -1,0 +1,37 @@
+name: Cleanup Azure Resource Group
+
+on:
+  workflow_call:
+    inputs:
+      resource_group:
+        description: 'The name of the Azure Resource Group to clean up'
+        required: true
+        type: string
+    secrets:
+      AZURE_CREDENTIALS:
+        description: 'Azure credentials in JSON format'
+        required: true
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Login to Azure
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Run Cleanup Script
+      run: |
+        chmod +x scripts/cleanup.sh
+        scripts/cleanup.sh ${{ inputs.resource_group }}
+
+    - name: Upload Cleanup Log as Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: cleanup.log
+        path: scripts/cleanup.log

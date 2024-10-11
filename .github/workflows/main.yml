@@ -1,0 +1,14 @@
+name: Cleanup Resources
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  invoke-cleanup:
+    uses: maidannikov/yem.workflow.azurergcleanup/.github/workflows/cleanup.yml@master
+    with:
+      resource_group: 'test-rg'
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
