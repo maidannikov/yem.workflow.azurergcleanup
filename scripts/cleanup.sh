@@ -5,7 +5,7 @@
 # Author: Yevhen Maidannikov                                                   #
 ################################################################################
 
-set -euxo pipefail
+set -euo pipefail
 
 # Set variables
 LOG_FILE="cleanup.log"
