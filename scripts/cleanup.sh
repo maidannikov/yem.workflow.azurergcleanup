@@ -164,10 +164,7 @@ initialize
 log "INFO" "Starting the cleanup of the resource group '$AZURE_RG'..."
 
 # Check if there are resources to clean up
-if ! resource_list; then
-    exit 0  # Exit if there are no resources to clean up
-fi
-
+resource_list
 # Disassociate public IPs from network interfaces
 disassociate_public_ips
 
