@@ -187,5 +187,5 @@ delete_resources
 report
 
 log "INFO" "List of resources after cleanup:"
-resource_list  # This will list remaining resources or indicate none are left
 log "INFO" "Cleanup of resource group '$AZURE_RG' completed."
+resource_list  # This will list remaining resources or indicate none are left
