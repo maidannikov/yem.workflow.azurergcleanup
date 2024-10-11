@@ -60,17 +60,16 @@ initialize() {
 }
 
 resource_list() {
-    resource_count=$(az resource list -g "$AZURE_RG" --query "length(@)" -o tsv) || {
-        log "ERROR" "Failed to list resources in resource group '$AZURE_RG'."
-        return 1  # Error occurred while executing the `az` command.
-    }
+    # Check if there are resources to list
+    resource_count=$(az resource list -g "$AZURE_RG" --query "length(@)" -o tsv)
+
     if [ -z "$resource_count" ] || [ "$resource_count" -eq 0 ]; then
         log "INFO" "No resources in resource group '$AZURE_RG'. Cleanup is not needed."
-        return 2  # Special return code indicating that no resources are present.
+        exit 0
     else
         log "INFO" "Listing resources with additional details:"
         az resource list -g "$AZURE_RG" --query "[].{Name:name, Type:type, Location:location}" -o table | tee -a "$LOG_FILE"
-        return 0  # Successful execution.
+        return 0
     fi
 }
 
@@ -164,23 +163,9 @@ initialize
 
 log "INFO" "Starting the cleanup of the resource group '$AZURE_RG'..."
 
-if resource_list; then
-    log "INFO" "Resources exist. Proceeding with cleanup."
-else
-    case $? in
-        2)
-            log "INFO" "No resources to clean up. Exiting."
-            exit 0
-            ;;
-        1)
-            log "ERROR" "Failed to list resources. Exiting with error."
-            exit 1
-            ;;
-        *)
-            log "ERROR" "Unknown error occurred during resource listing."
-            exit 1
-            ;;
-    esac
+# Check if there are resources to clean up
+if ! resource_list; then
+    exit 0  # Exit if there are no resources to clean up
 fi
 
 # Disassociate public IPs from network interfaces
